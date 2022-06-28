@@ -11,6 +11,13 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+
+    private final STOMPAuthenticationFilter stompAuthenticationFilter;
+
+    public WebSocketConfig(STOMPAuthenticationFilter stompAuthenticationFilter) {
+        this.stompAuthenticationFilter = stompAuthenticationFilter;
+    }
+
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.setApplicationDestinationPrefixes("/chat");
@@ -24,6 +31,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(new STOMPAuthenticationFilter());
+        registration.interceptors(stompAuthenticationFilter);
     }
 }

@@ -25,6 +25,15 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    public Optional<User> findUserByUsername(String username) {
+        return userRepository.findUserByUsername(username);
+    }
+
+    public User getUserByUsernameOrThrow(String username) {
+        return userRepository.findUserByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    }
+
     public String loginUser(LoginCredentialsDTO credentials) {
         if (credentials.username() == null || credentials.password() == null)
             throw new InvalidCredentialsException();
@@ -43,9 +52,9 @@ public class UserService {
         if (credentials.username() == null || credentials.name() == null || credentials.password() == null)
             throw new InvalidCredentialsException();
 
-        final Optional<User> user = userRepository.findUserByUsername(credentials.username());
-        if (user.isPresent())
-            throw new UserAlreadyExistsException();
+        final User user = userRepository
+                .findUserByUsername(credentials.username())
+                .orElseThrow(UserAlreadyExistsException::new);
 
         final User newUser = User.builder()
                 .username(credentials.username())
@@ -53,6 +62,7 @@ public class UserService {
                 .encryptedPassword(passwordEncoder.encode(credentials.password()))
                 .build();
         userRepository.save(newUser);
+
         return JWT.create()
                 .withSubject(credentials.username())
                 .sign(SecurityConfig.JWT_SIGNING_ALGORITHM);

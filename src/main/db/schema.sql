@@ -1,19 +1,32 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
-CREATE TABLE IF NOT EXISTS users
+CREATE TABLE users
 (
     id                 uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
     username           varchar(32) NOT NUll UNIQUE,
     name               varchar(64) NOT NULL,
-    encrypted_password TEXT        NOT NULL
+    encrypted_password text        NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS messages
+CREATE TABLE group_chat
 (
-    id        uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-    author_id uuid         NOT NULL, -- TODO: add ability to delete users
-    text      varchar(256) NOT NULL,
-    sent_on   timestamp    NOT NULL,
+    id   uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name varchar(64) NOT NULL
+);
 
-    CONSTRAINT fk_author FOREIGN KEY (author_id) REFERENCES users (id)
+CREATE TABLE user_group_chat
+(
+    user_id       uuid REFERENCES users (id) ON DELETE CASCADE,
+    group_chat_id uuid REFERENCES group_chat (id) ON DELETE CASCADE,
+    CONSTRAINT user_group_chat_pkey PRIMARY KEY (user_id, group_chat_id)
+);
+
+CREATE TABLE message
+(
+    id            uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    group_chat_id uuid         NOT NULL REFERENCES group_chat (id),
+    -- TODO: add ability to delete users
+    author_id     uuid         NOT NULL REFERENCES users (id),
+    text          varchar(256) NOT NULL,
+    sent_on       timestamp    NOT NULL
 );

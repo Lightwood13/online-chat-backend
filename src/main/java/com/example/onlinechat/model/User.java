@@ -2,10 +2,8 @@ package com.example.onlinechat.model;
 
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -25,4 +23,7 @@ public class User {
     private String name;
 
     private String encryptedPassword;
+
+    @ManyToMany(mappedBy = "members", fetch = FetchType.LAZY)
+    Set<GroupChat> groupChats;
 }
