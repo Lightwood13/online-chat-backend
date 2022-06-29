@@ -2,6 +2,7 @@ package com.example.onlinechat.service;
 
 import com.example.onlinechat.model.User;
 import com.example.onlinechat.service.dto.GroupChatDTO;
+import com.example.onlinechat.service.dto.UserDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -25,6 +26,9 @@ public class AggregatorService {
                 .map(groupChat -> new GroupChatDTO(
                         groupChat.getId(),
                         groupChat.getName(),
+                        groupChat.getMembers().stream()
+                                .map(UserDTO::fromUser)
+                                .collect(Collectors.toSet()),
                         messageService.getLastMessageForGroupChat(groupChat)
                 ))
                 .collect(Collectors.toSet());
