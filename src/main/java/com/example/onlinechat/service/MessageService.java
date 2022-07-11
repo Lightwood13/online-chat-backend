@@ -7,61 +7,37 @@ import com.example.onlinechat.repository.MessageRepository;
 import com.example.onlinechat.service.dto.MessageDTO;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Service
+@Transactional
 public class MessageService {
 
     private final MessageRepository messageRepository;
 
-    private final UserService userService;
-    private final GroupChatService groupChatService;
-
-    MessageService(
-            MessageRepository messageRepository,
-            UserService userService,
-            GroupChatService groupChatService) {
+    MessageService(MessageRepository messageRepository) {
         this.messageRepository = messageRepository;
-        this.userService = userService;
-        this.groupChatService = groupChatService;
     }
 
-    public List<MessageDTO> getAllMessagesForGroupChat(UUID groupChatId, String username) {
-        groupChatService.confirmAccessOrThrow(groupChatId, username);
-
-        final GroupChat groupChat = groupChatService.getByIdOrThrow(groupChatId);
-
-        Iterable<Message> allMessages = messageRepository
-                .findAllByGroupChatOrderBySentOn(groupChat);
-
-        return StreamSupport.stream(allMessages.spliterator(), false)
+    public List<MessageDTO> findAllByGroupChatIdOrderBySentOn(UUID groupChatId) {
+        return messageRepository.findAllByGroupChatIdOrderBySentOn(groupChatId)
+                .stream()
                 .map(MessageDTO::fromMessage)
-                .collect(Collectors.toList());
+                .toList();
     }
 
-    public Optional<MessageDTO> getLastMessageForGroupChat(GroupChat groupChat) {
-        return messageRepository.findTopByGroupChatOrderBySentOnDesc(groupChat)
-                .map(MessageDTO::fromMessage);
-    }
-
-    public Message save(String username, UUID groupChatId, String message) {
-        groupChatService.confirmAccessOrThrow(groupChatId, username);
-
-        final User user = userService.getUserByUsernameOrThrow(username);
-        final GroupChat groupChat = groupChatService.getByIdOrThrow(groupChatId);
-
-        return messageRepository.save(Message.builder()
-                .groupChat(groupChat)
-                .author(user)
-                .text(message)
+    public MessageDTO save(UUID groupChatId, UUID userId, String text) {
+        final Message savedMessage = messageRepository.save(Message.builder()
+                .groupChat(GroupChat.of(groupChatId))
+                .author(User.of(userId))
+                .text(text)
                 .sentOn(Timestamp.from(Instant.now()))
                 .build()
         );
+        return MessageDTO.fromMessage(savedMessage);
     }
 }

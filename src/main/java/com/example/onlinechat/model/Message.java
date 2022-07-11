@@ -11,7 +11,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor()
+@AllArgsConstructor
 @Builder
 public class Message {
     @Id

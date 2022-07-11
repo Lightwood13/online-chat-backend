@@ -24,6 +24,14 @@ public class User {
 
     private String encryptedPassword;
 
+    private String profilePhotoLocation;
+
     @ManyToMany(mappedBy = "members", fetch = FetchType.LAZY)
     Set<GroupChat> groupChats;
+
+    public static User of(UUID id) {
+        final User result = new User();
+        result.setId(id);
+        return result;
+    }
 }

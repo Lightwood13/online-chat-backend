@@ -2,16 +2,18 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE users
 (
-    id                 uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-    username           varchar(32) NOT NUll UNIQUE,
-    name               varchar(64) NOT NULL,
-    encrypted_password text        NOT NULL
+    id                     uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    username               varchar(32) NOT NUll UNIQUE,
+    name                   varchar(64) NOT NULL,
+    encrypted_password     text        NOT NULL,
+    profile_photo_location text
 );
 
 CREATE TABLE group_chat
 (
-    id   uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-    name varchar(64) NOT NULL
+    id                     uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name                   varchar(64) NOT NULL,
+    profile_photo_location text
 );
 
 CREATE TABLE user_group_chat

@@ -18,6 +18,8 @@ public class GroupChat {
 
     private String name;
 
+    private String profilePhotoLocation;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_group_chat",
@@ -25,4 +27,10 @@ public class GroupChat {
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     Set<User> members;
+
+    public static GroupChat of(UUID id) {
+        final GroupChat result = new GroupChat();
+        result.setId(id);
+        return result;
+    }
 }

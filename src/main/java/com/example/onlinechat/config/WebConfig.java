@@ -25,6 +25,7 @@ public class WebConfig {
                 .authorizeRequests()
                 .antMatchers("/login").permitAll()
                 .antMatchers("/signup").permitAll()
+                .antMatchers("/photo/*").permitAll()
                 .antMatchers("/ws-connect/**").permitAll()
                 .anyRequest().authenticated()
                 .and()

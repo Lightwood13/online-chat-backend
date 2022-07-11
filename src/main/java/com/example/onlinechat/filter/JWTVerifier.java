@@ -35,7 +35,7 @@ public class JWTVerifier {
                         return null;
                     }
                 }
-        ).filter(name -> userService.findUserByUsername(name).isPresent());
+        )/*.filter(name -> userService.findUserByUsername(name).isPresent())*/;
 
         return username.map(name -> new UsernamePasswordAuthenticationToken(
                 name,

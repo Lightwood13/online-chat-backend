@@ -1,11 +1,12 @@
 package com.example.onlinechat.controller;
 
-import com.example.onlinechat.service.dto.LoginCredentialsDTO;
 import com.example.onlinechat.service.UserService;
+import com.example.onlinechat.service.dto.LoginCredentialsDTO;
 import com.example.onlinechat.service.dto.SignUpCredentialsDTO;
-import com.example.onlinechat.service.dto.UserDTO;
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class AuthenticationController {
@@ -26,13 +27,5 @@ public class AuthenticationController {
     @PostMapping("/signup")
     public String signup(@RequestBody SignUpCredentialsDTO credentials) {
         return userService.signupUser(credentials);
-    }
-
-    @CrossOrigin
-    @GetMapping("/my-info")
-    public UserDTO myInfo(Authentication authentication) {
-        return UserDTO.fromUser(
-                userService.getUserByUsernameOrThrow(authentication.getName())
-        );
     }
 }

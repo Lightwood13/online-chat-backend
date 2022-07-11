@@ -1,57 +1,73 @@
 package com.example.onlinechat.controller;
 
-import com.example.onlinechat.model.Message;
-import com.example.onlinechat.service.AggregatorService;
-import com.example.onlinechat.service.MessageService;
-import com.example.onlinechat.service.dto.GroupChatDTO;
-import com.example.onlinechat.service.dto.MessageDTO;
-import com.example.onlinechat.service.dto.NewMessageDTO;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
+import com.example.onlinechat.model.GroupChat;
+import com.example.onlinechat.service.GroupChatService;
+import com.example.onlinechat.service.NotificationService;
+import com.example.onlinechat.service.dto.*;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Set;
+import java.util.Objects;
 import java.util.UUID;
 
-@Controller
+@RestController
 public class ChatController {
 
-    private final MessageService messageService;
-    private final AggregatorService aggregatorService;
+    private final GroupChatService groupChatService;
+    private final NotificationService notificationService;
 
-    ChatController(MessageService messageService, AggregatorService aggregatorService) {
-        this.messageService = messageService;
-        this.aggregatorService = aggregatorService;
-    }
-
-    @CrossOrigin
-    @GetMapping("/chat/{groupChatId}")
-    public @ResponseBody List<MessageDTO> chat(@PathVariable UUID groupChatId, Authentication authentication) {
-        return messageService.getAllMessagesForGroupChat(groupChatId, authentication.getName());
+    ChatController(
+            GroupChatService groupChatService,
+            NotificationService notificationService) {
+        this.groupChatService = groupChatService;
+        this.notificationService = notificationService;
     }
 
     @CrossOrigin
     @GetMapping("/chats")
-    public @ResponseBody Set<GroupChatDTO> chats(Authentication authentication) {
-        return aggregatorService.getChatsForUser(authentication.getName());
+    public List<GroupChatWithLastMessageDTO> chats(Authentication authentication) {
+        return groupChatService.findGroupChatsWithLastMessageByMemberUsername(authentication.getName());
     }
 
-    @MessageMapping("/send")
-    @SendTo("/messages/new")
-    public MessageDTO sendMessage(NewMessageDTO message, Authentication authentication) {
-        final Message savedMessage = messageService
-                .save(authentication.getName(), message.groupChatId(), message.text());
-        return new MessageDTO(
-                savedMessage.getId(),
-                savedMessage.getAuthor().getName(),
-                message.text(),
-                savedMessage.getSentOn()
+    @CrossOrigin
+    @GetMapping("/chat/{groupChatId}")
+    public GroupChatWithMembersAndMessagesDTO chat(@PathVariable UUID groupChatId, Authentication authentication) {
+        return groupChatService.getGroupChatWithMembersAndMessagesById(groupChatId, authentication.getName());
+    }
+
+    @CrossOrigin
+    @PostMapping("/send")
+    public void sendMessage(@RequestBody NewMessageDTO message, Authentication authentication) {
+        final MessageDTO savedMessage = groupChatService.saveNewMessage(
+                authentication.getName(),
+                message.groupChatId(),
+                message.text());
+        notificationService.notifyAboutNewMessage(savedMessage);
+    }
+
+    @CrossOrigin
+    @PostMapping("/group-chat-profile-photo/{group-chat-id}")
+    public FileLocationDTO uploadChatProfilePhoto(
+            @PathVariable("group-chat-id") UUID groupChatId,
+            @RequestParam MultipartFile file,
+            Authentication authentication) throws Exception {
+        final FileLocationDTO result = groupChatService.updateProfilePhoto(
+                groupChatId,
+                authentication.getName(),
+                file.getBytes(),
+                Objects.requireNonNull(file.getOriginalFilename())
         );
+
+        final GroupChat updatedGroupChat = groupChatService.getByIdOrThrow(groupChatId);
+        updatedGroupChat
+                .getMembers()
+                .forEach(user -> notificationService.notifyAboutGroupChatProfileUpdate(
+                        user.getId(),
+                        updatedGroupChat
+                ));
+
+        return result;
     }
 }
