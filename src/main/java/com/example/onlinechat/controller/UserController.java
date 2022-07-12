@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -24,15 +25,15 @@ public class UserController {
     }
 
     @CrossOrigin
-    @GetMapping("/profile-info")
+    @GetMapping("/my-profile-info")
     public UserDTO myInfo(Authentication authentication) {
         return UserDTO.fromUser(userService.getUserByUsernameOrThrow(authentication.getName()));
     }
 
     @CrossOrigin
-    @GetMapping("/profile-info/{user-id}")
-    public UserDTO profileInfo(@PathVariable("user-id") String userId) {
-        return UserDTO.fromUser(userService.getUserByIdOrThrow(UUID.fromString(userId)));
+    @GetMapping("/profile-info")
+    public List<UserDTO> profileInfo(@RequestParam List<UUID> ids, String userId) {
+        return userService.findUsersByIdIn(ids);
     }
 
     @CrossOrigin

@@ -9,11 +9,13 @@ import com.example.onlinechat.repository.UserRepository;
 import com.example.onlinechat.service.dto.FileLocationDTO;
 import com.example.onlinechat.service.dto.LoginCredentialsDTO;
 import com.example.onlinechat.service.dto.SignUpCredentialsDTO;
+import com.example.onlinechat.service.dto.UserDTO;
 import com.example.onlinechat.util.Util;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -46,6 +48,12 @@ public class UserService {
     public User getUserByUsernameOrThrow(String username) {
         return userRepository.findUserByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    }
+
+    public List<UserDTO> findUsersByIdIn(List<UUID> ids) {
+        return userRepository.findUsersByIdIn(ids)
+                .stream().map(UserDTO::fromUser)
+                .toList();
     }
 
     public User getUserByIdOrThrow(UUID id) {
