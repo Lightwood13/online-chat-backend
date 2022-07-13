@@ -1,6 +1,5 @@
 package com.example.onlinechat.controller;
 
-import com.example.onlinechat.model.GroupChat;
 import com.example.onlinechat.service.GroupChatService;
 import com.example.onlinechat.service.NotificationService;
 import com.example.onlinechat.service.dto.*;
@@ -60,13 +59,8 @@ public class ChatController {
                 Objects.requireNonNull(file.getOriginalFilename())
         );
 
-        final GroupChat updatedGroupChat = groupChatService.getByIdOrThrow(groupChatId);
-        updatedGroupChat
-                .getMembers()
-                .forEach(user -> notificationService.notifyAboutGroupChatProfileUpdate(
-                        user.getId(),
-                        updatedGroupChat
-                ));
+        final GroupChatDTO updatedGroupChat = groupChatService.getByIdOrThrow(groupChatId);
+        notificationService.notifyAboutGroupChatProfileUpdate(updatedGroupChat);
 
         return result;
     }

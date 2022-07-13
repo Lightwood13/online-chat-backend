@@ -1,6 +1,6 @@
 package com.example.onlinechat.controller;
 
-import com.example.onlinechat.model.User;
+import com.example.onlinechat.service.GroupChatService;
 import com.example.onlinechat.service.NotificationService;
 import com.example.onlinechat.service.UserService;
 import com.example.onlinechat.service.dto.FileLocationDTO;
@@ -17,17 +17,22 @@ import java.util.UUID;
 public class UserController {
 
     private final UserService userService;
+    private final GroupChatService groupChatService;
     private final NotificationService notificationService;
 
-    public UserController(UserService userService, NotificationService notificationService) {
+    public UserController(
+            UserService userService,
+            GroupChatService groupChatService,
+            NotificationService notificationService) {
         this.userService = userService;
+        this.groupChatService = groupChatService;
         this.notificationService = notificationService;
     }
 
     @CrossOrigin
     @GetMapping("/my-profile-info")
     public UserDTO myInfo(Authentication authentication) {
-        return UserDTO.fromUser(userService.getUserByUsernameOrThrow(authentication.getName()));
+        return userService.getByUsernameOrThrow(authentication.getName());
     }
 
     @CrossOrigin
@@ -48,12 +53,11 @@ public class UserController {
                 Objects.requireNonNull(file.getOriginalFilename())
         );
 
-        final User updatedUser = userService.getUserByUsernameOrThrow(authentication.getName());
-        updatedUser
-                .getGroupChats().stream()
-                .flatMap(groupChat -> groupChat.getMembers().stream())
-                .distinct()
-                .forEach(user -> notificationService.notifyAboutProfileUpdate(user.getId(), updatedUser));
+        final UserDTO updatedUser = userService.getByUsernameOrThrow(authentication.getName());
+        notificationService.notifyAboutProfileUpdate(
+                groupChatService.findUserIdsThatShareGroupChatWith(updatedUser.id()),
+                updatedUser
+        );
 
         return result;
     }

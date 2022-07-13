@@ -14,12 +14,11 @@ public class FileService {
         this.fileRepository = fileRepository;
     }
 
-    public String save(byte[] content, String extension) throws Exception {
+    public String saveOrUpdate(byte[] content, String extension, String previousLocation) throws Exception {
+        if (previousLocation != null) {
+            fileRepository.delete(previousLocation);
+        }
         return fileRepository.save(content, extension);
-    }
-
-    public void delete(String location) throws Exception {
-        fileRepository.delete(location);
     }
 
     public Optional<Resource> find(String location) {

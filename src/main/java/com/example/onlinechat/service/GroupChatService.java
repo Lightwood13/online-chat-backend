@@ -5,10 +5,7 @@ import com.example.onlinechat.model.GroupChat;
 import com.example.onlinechat.model.User;
 import com.example.onlinechat.repository.GroupChatRepository;
 import com.example.onlinechat.repository.UserGroupChatRepository;
-import com.example.onlinechat.service.dto.FileLocationDTO;
-import com.example.onlinechat.service.dto.GroupChatWithLastMessageDTO;
-import com.example.onlinechat.service.dto.GroupChatWithMembersAndMessagesDTO;
-import com.example.onlinechat.service.dto.MessageDTO;
+import com.example.onlinechat.service.dto.*;
 import com.example.onlinechat.util.Util;
 import org.springframework.stereotype.Service;
 
@@ -37,9 +34,13 @@ public class GroupChatService {
         this.messageService = messageService;
     }
 
-    public GroupChat getByIdOrThrow(UUID id) {
+    private GroupChat getGroupChatByIdOrThrow(UUID id) {
         return groupChatRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Group chat not found"));
+    }
+
+    public GroupChatDTO getByIdOrThrow(UUID id) {
+        return GroupChatDTO.fromGroupChat(getGroupChatByIdOrThrow(id));
     }
 
     public void confirmAccessOrThrow(UUID groupChatId, String username) {
@@ -47,12 +48,19 @@ public class GroupChatService {
             throw new ForbiddenException();
     }
 
+    public List<UUID> findUserIdsThatShareGroupChatWith(UUID userId) {
+        return userGroupChatRepository.getUserIdsThatShareGroupChatWith(userId.toString())
+                .stream()
+                .map(UUID::fromString)
+                .toList();
+    }
+
     public List<GroupChatWithLastMessageDTO> findGroupChatsWithLastMessageByMemberUsername(String username) {
         return groupChatRepository.findGroupChatsWithLastMessageByMemberUsername(username);
     }
 
     public GroupChatWithMembersAndMessagesDTO getGroupChatWithMembersAndMessagesById(UUID groupChatId, String username) {
-        final GroupChat groupChat = getByIdOrThrow(groupChatId);
+        final GroupChat groupChat = getGroupChatByIdOrThrow(groupChatId);
 
         final Set<User> members = groupChat.getMembers();
         members.stream()
@@ -82,14 +90,12 @@ public class GroupChatService {
         final String extension = Util.getFileExtension(originalFilename);
 
         confirmAccessOrThrow(groupChatId, username);
-        final GroupChat groupChat = getByIdOrThrow(groupChatId);
+        final GroupChat groupChat = getGroupChatByIdOrThrow(groupChatId);
 
-        final String previousLocation = groupChat.getProfilePhotoLocation();
-        if (previousLocation != null) {
-            fileService.delete(previousLocation);
-        }
-
-        final String location = fileService.save(photo, extension);
+        final String location = fileService.saveOrUpdate(
+                photo,
+                extension,
+                groupChat.getProfilePhotoLocation());
         groupChat.setProfilePhotoLocation(location);
         return new FileLocationDTO(location);
     }

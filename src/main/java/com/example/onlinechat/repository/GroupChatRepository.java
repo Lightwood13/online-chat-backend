@@ -25,7 +25,7 @@ public interface GroupChatRepository extends CrudRepository<GroupChat, UUID> {
             " JOIN user_group_chat ugc ON gc.id = ugc.group_chat_id" +
             " JOIN users u             ON ugc.user_id = u.id" +
             " JOIN message m           ON gc.id = m.group_chat_id" +
-            " WHERE u.username=:username" +
+            " WHERE u.username = :username" +
             " ORDER BY gc.id, sent_on DESC",
             nativeQuery = true)
     List<GroupChatWithLastMessageDTO> findGroupChatsWithLastMessageByMemberUsername(@Param("username") String username);
@@ -34,8 +34,7 @@ public interface GroupChatRepository extends CrudRepository<GroupChat, UUID> {
             " FROM user_group_chat ugc" +
             " JOIN group_chat gc ON ugc.group_chat_id = gc.id" +
             " JOIN users u       ON ugc.user_id = u.id" +
-            " WHERE cast(gc.id AS varchar)=:groupChatId AND u.username=:username",
+            " WHERE cast(gc.id AS varchar) = :groupChatId AND u.username = :username",
             nativeQuery = true)
     Optional<String> getUserIdIfMember(@Param("groupChatId") String groupChatId, @Param("username") String username);
-
 }

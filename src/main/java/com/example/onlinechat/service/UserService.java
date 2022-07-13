@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -41,13 +40,13 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public Optional<User> findUserByUsername(String username) {
-        return userRepository.findUserByUsername(username);
-    }
-
-    public User getUserByUsernameOrThrow(String username) {
+    private User getUserByUsernameOrThrow(String username) {
         return userRepository.findUserByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    }
+
+    public UserDTO getByUsernameOrThrow(String username) {
+        return UserDTO.fromUser(getUserByUsernameOrThrow(username));
     }
 
     public List<UserDTO> findUsersByIdIn(List<UUID> ids) {
@@ -56,22 +55,14 @@ public class UserService {
                 .toList();
     }
 
-    public User getUserByIdOrThrow(UUID id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-    }
-
-    @Transactional
     public FileLocationDTO updateProfilePhoto(String username, byte[] photo, String originalFilename) throws Exception {
         final String extension = Util.getFileExtension(originalFilename);
-
         final User user = getUserByUsernameOrThrow(username);
-        final String previousLocation = user.getProfilePhotoLocation();
-        if (previousLocation != null) {
-            fileService.delete(previousLocation);
-        }
 
-        final String location = fileService.save(photo, extension);
+        final String location = fileService.saveOrUpdate(
+                photo,
+                extension,
+                user.getProfilePhotoLocation());
         user.setProfilePhotoLocation(location);
         return new FileLocationDTO(location);
     }

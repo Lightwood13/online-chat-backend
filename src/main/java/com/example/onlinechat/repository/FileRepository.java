@@ -19,8 +19,7 @@ public class FileRepository {
 
     public String save(byte[] content, String extension) throws Exception {
         final String localPath = UUID.randomUUID() + "." + extension;
-        final Path newFile = Paths.get(STORAGE_DIR, localPath);
-        Files.write(newFile, content);
+        Files.write(Paths.get(STORAGE_DIR, localPath), content);
         return localPath;
     }
 
