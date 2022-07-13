@@ -9,6 +9,13 @@ CREATE TABLE users
     profile_photo_location text
 );
 
+CREATE TABLE friend
+(
+    user_id   uuid NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+    friend_id uuid NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+    CONSTRAINT friends_pkey PRIMARY KEY (user_id, friend_id)
+);
+
 CREATE TABLE group_chat
 (
     id                     uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -18,8 +25,8 @@ CREATE TABLE group_chat
 
 CREATE TABLE user_group_chat
 (
-    user_id       uuid REFERENCES users (id) ON DELETE CASCADE,
-    group_chat_id uuid REFERENCES group_chat (id) ON DELETE CASCADE,
+    user_id       uuid NOT NULL REFERENCES users (id)      ON DELETE CASCADE,
+    group_chat_id uuid NOT NULL REFERENCES group_chat (id) ON DELETE CASCADE,
     CONSTRAINT user_group_chat_pkey PRIMARY KEY (user_id, group_chat_id)
 );
 

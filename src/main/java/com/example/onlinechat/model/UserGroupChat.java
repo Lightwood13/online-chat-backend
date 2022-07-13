@@ -1,12 +1,14 @@
 package com.example.onlinechat.model;
 
+import com.example.onlinechat.model.keys.UserGroupChatPrimaryKey;
+
 import javax.persistence.*;
 
 @Entity
 @Table(name = "user_group_chat")
 public class UserGroupChat {
     @EmbeddedId
-    UserGroupChatKey id;
+    UserGroupChatPrimaryKey id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("userId")

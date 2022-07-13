@@ -1,7 +1,7 @@
 package com.example.onlinechat.repository;
 
 import com.example.onlinechat.model.UserGroupChat;
-import com.example.onlinechat.model.UserGroupChatKey;
+import com.example.onlinechat.model.keys.UserGroupChatPrimaryKey;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface UserGroupChatRepository extends CrudRepository<UserGroupChat, UserGroupChatKey> {
+public interface UserGroupChatRepository extends CrudRepository<UserGroupChat, UserGroupChatPrimaryKey> {
     boolean existsByUserUsernameAndGroupChatId(String username, UUID groupChatId);
 
     @Query(value = "SELECT DISTINCT cast(ugc.user_id AS varchar)" +

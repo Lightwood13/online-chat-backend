@@ -1,4 +1,4 @@
-package com.example.onlinechat.model;
+package com.example.onlinechat.model.keys;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -12,7 +12,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @EqualsAndHashCode
-public class UserGroupChatKey implements Serializable {
+public class UserGroupChatPrimaryKey implements Serializable {
     UUID userId;
     UUID groupChatId;
 }
