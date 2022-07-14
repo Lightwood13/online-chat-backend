@@ -3,11 +3,10 @@ package com.example.onlinechat.controller;
 import com.example.onlinechat.service.FriendService;
 import com.example.onlinechat.service.dto.UserDTO;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 public class FriendController {
@@ -21,6 +20,6 @@ public class FriendController {
     @CrossOrigin
     @GetMapping("/my-friends")
     public List<UserDTO> myFriends(Authentication authentication) {
-        return friendService.getFriendsByUserUsername(authentication.getName());
+        return friendService.getFriendsByUserId(UUID.fromString(authentication.getName()));
     }
 }

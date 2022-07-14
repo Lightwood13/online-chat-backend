@@ -43,8 +43,8 @@ public class GroupChatService {
         return GroupChatDTO.fromGroupChat(getGroupChatByIdOrThrow(id));
     }
 
-    public void confirmAccessOrThrow(UUID groupChatId, String username) {
-        if (!userGroupChatRepository.existsByUserUsernameAndGroupChatId(username, groupChatId))
+    private void confirmAccessOrThrow(UUID groupChatId, UUID userId) {
+        if (!userGroupChatRepository.existsByUserIdAndGroupChatId(userId, groupChatId))
             throw new ForbiddenException();
     }
 
@@ -55,16 +55,16 @@ public class GroupChatService {
                 .toList();
     }
 
-    public List<GroupChatWithLastMessageDTO> findGroupChatsWithLastMessageByMemberUsername(String username) {
-        return groupChatRepository.findGroupChatsWithLastMessageByMemberUsername(username);
+    public List<GroupChatWithLastMessageDTO> findGroupChatsWithLastMessageByMemberId(UUID id) {
+        return groupChatRepository.findGroupChatsWithLastMessageByMemberId(id.toString());
     }
 
-    public GroupChatWithMembersAndMessagesDTO getGroupChatWithMembersAndMessagesById(UUID groupChatId, String username) {
+    public GroupChatWithMembersAndMessagesDTO getGroupChatWithMembersAndMessagesById(UUID groupChatId, UUID userId) {
         final GroupChat groupChat = getGroupChatByIdOrThrow(groupChatId);
 
         final Set<User> members = groupChat.getMembers();
         members.stream()
-                .filter(user -> user.getUsername().equals(username))
+                .filter(user -> user.getId().equals(userId))
                 .findFirst()
                 .orElseThrow(ForbiddenException::new);
 
@@ -73,23 +73,20 @@ public class GroupChatService {
         return new GroupChatWithMembersAndMessagesDTO(groupChat, members, messages);
     }
 
-    public MessageDTO saveNewMessage(String username, UUID groupChatId, String message) {
-        UUID userId = groupChatRepository.getUserIdIfMember(groupChatId.toString(), username)
-                .map(UUID::fromString)
-                .orElseThrow(ForbiddenException::new);
-
+    public MessageDTO saveNewMessage(UUID userId, UUID groupChatId, String message) {
+        confirmAccessOrThrow(groupChatId, userId);
         return messageService.save(groupChatId, userId, message);
     }
 
     public FileLocationDTO updateProfilePhoto(
             UUID groupChatId,
-            String username,
+            UUID userId,
             byte[] photo,
             String originalFilename
     ) throws Exception {
         final String extension = Util.getFileExtension(originalFilename);
 
-        confirmAccessOrThrow(groupChatId, username);
+        confirmAccessOrThrow(groupChatId, userId);
         final GroupChat groupChat = getGroupChatByIdOrThrow(groupChatId);
 
         final String location = fileService.saveOrUpdate(

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -16,8 +17,8 @@ public class FriendService {
         this.friendRepository = friendRepository;
     }
 
-    public List<UserDTO> getFriendsByUserUsername(String username) {
-        return friendRepository.getFriendsByUserUsername(username)
+    public List<UserDTO> getFriendsByUserId(UUID userId) {
+        return friendRepository.getFriendsByUserId(userId.toString())
                 .stream().map(UserDTO::fromUserProjection).toList();
     }
 

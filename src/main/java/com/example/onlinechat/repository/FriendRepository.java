@@ -16,10 +16,9 @@ public interface FriendRepository extends CrudRepository<Friend, FriendPrimaryKe
             " cast(uf.id AS varchar)    AS id," +
             " uf.name                   AS name," +
             " uf.profile_photo_location AS profilePhotoLocation" +
-            " FROM users u" +
-            " JOIN friend f on u.id = f.user_id" +
-            " JOIN users uf on uf.id = f.friend_id" +
-            " WHERE u.username = :username",
+            " FROM friend f" +
+            " JOIN users uf ON uf.id = f.friend_id" +
+            " WHERE cast(f.user_id AS varchar) = :user_id",
             nativeQuery = true)
-    List<UserProjection> getFriendsByUserUsername(@Param("username") String username);
+    List<UserProjection> getFriendsByUserId(@Param("user_id") String userId);
 }

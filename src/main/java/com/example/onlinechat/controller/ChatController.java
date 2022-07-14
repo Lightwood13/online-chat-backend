@@ -27,20 +27,20 @@ public class ChatController {
     @CrossOrigin
     @GetMapping("/chats")
     public List<GroupChatWithLastMessageDTO> chats(Authentication authentication) {
-        return groupChatService.findGroupChatsWithLastMessageByMemberUsername(authentication.getName());
+        return groupChatService.findGroupChatsWithLastMessageByMemberId(UUID.fromString(authentication.getName()));
     }
 
     @CrossOrigin
     @GetMapping("/chat/{groupChatId}")
     public GroupChatWithMembersAndMessagesDTO chat(@PathVariable UUID groupChatId, Authentication authentication) {
-        return groupChatService.getGroupChatWithMembersAndMessagesById(groupChatId, authentication.getName());
+        return groupChatService.getGroupChatWithMembersAndMessagesById(groupChatId, UUID.fromString(authentication.getName()));
     }
 
     @CrossOrigin
     @PostMapping("/send")
     public void sendMessage(@RequestBody NewMessageDTO message, Authentication authentication) {
         final MessageDTO savedMessage = groupChatService.saveNewMessage(
-                authentication.getName(),
+                UUID.fromString(authentication.getName()),
                 message.groupChatId(),
                 message.text());
         notificationService.notifyAboutNewMessage(savedMessage);
@@ -54,7 +54,7 @@ public class ChatController {
             Authentication authentication) throws Exception {
         final FileLocationDTO result = groupChatService.updateProfilePhoto(
                 groupChatId,
-                authentication.getName(),
+                UUID.fromString(authentication.getName()),
                 file.getBytes(),
                 Objects.requireNonNull(file.getOriginalFilename())
         );

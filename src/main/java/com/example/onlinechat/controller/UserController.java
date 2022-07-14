@@ -32,12 +32,12 @@ public class UserController {
     @CrossOrigin
     @GetMapping("/my-profile-info")
     public UserDTO myInfo(Authentication authentication) {
-        return userService.getByUsernameOrThrow(authentication.getName());
+        return userService.getByIdOrThrow(UUID.fromString(authentication.getName()));
     }
 
     @CrossOrigin
     @GetMapping("/profile-info")
-    public List<UserDTO> profileInfo(@RequestParam List<UUID> ids, String userId) {
+    public List<UserDTO> profileInfo(@RequestParam List<UUID> ids) {
         return userService.findUsersByIdIn(ids);
     }
 
@@ -48,12 +48,12 @@ public class UserController {
             Authentication authentication
     ) throws Exception {
         final FileLocationDTO result = userService.updateProfilePhoto(
-                authentication.getName(),
+                UUID.fromString(authentication.getName()),
                 file.getBytes(),
                 Objects.requireNonNull(file.getOriginalFilename())
         );
 
-        final UserDTO updatedUser = userService.getByUsernameOrThrow(authentication.getName());
+        final UserDTO updatedUser = userService.getByIdOrThrow(UUID.fromString(authentication.getName()));
         notificationService.notifyAboutProfileUpdate(
                 groupChatService.findUserIdsThatShareGroupChatWith(updatedUser.id()),
                 updatedUser

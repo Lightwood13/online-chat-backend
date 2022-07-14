@@ -40,13 +40,13 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    private User getUserByUsernameOrThrow(String username) {
-        return userRepository.findUserByUsername(username)
+    private User getUserByIdOrThrow(UUID userId) {
+        return userRepository.findUserById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 
-    public UserDTO getByUsernameOrThrow(String username) {
-        return UserDTO.fromUser(getUserByUsernameOrThrow(username));
+    public UserDTO getByIdOrThrow(UUID userId) {
+        return UserDTO.fromUser(getUserByIdOrThrow(userId));
     }
 
     public List<UserDTO> findUsersByIdIn(List<UUID> ids) {
@@ -55,9 +55,9 @@ public class UserService {
                 .toList();
     }
 
-    public FileLocationDTO updateProfilePhoto(String username, byte[] photo, String originalFilename) throws Exception {
+    public FileLocationDTO updateProfilePhoto(UUID userId, byte[] photo, String originalFilename) throws Exception {
         final String extension = Util.getFileExtension(originalFilename);
-        final User user = getUserByUsernameOrThrow(username);
+        final User user = getUserByIdOrThrow(userId);
 
         final String location = fileService.saveOrUpdate(
                 photo,
@@ -71,13 +71,12 @@ public class UserService {
         if (credentials.username() == null || credentials.password() == null)
             throw new InvalidCredentialsException();
 
-        userRepository.findUserByUsername(credentials.username())
-                .map(User::getEncryptedPassword)
-                .filter(password -> passwordEncoder.matches(credentials.password(), password))
+        final User user = userRepository.findUserByUsername(credentials.username())
+                .filter(u -> passwordEncoder.matches(credentials.password(), u.getEncryptedPassword()))
                 .orElseThrow(InvalidCredentialsException::new);
 
         return JWT.create() // TODO: add expiration date
-                .withSubject(credentials.username())
+                .withSubject(user.getId().toString())
                 .sign(SecurityConfig.JWT_SIGNING_ALGORITHM);
     }
 
@@ -97,7 +96,7 @@ public class UserService {
         userRepository.save(newUser);
 
         return JWT.create()
-                .withSubject(credentials.username())
+                .withSubject(newUser.getId().toString())
                 .sign(SecurityConfig.JWT_SIGNING_ALGORITHM);
     }
 }
