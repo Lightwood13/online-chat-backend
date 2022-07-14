@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+@CrossOrigin
 @RestController
 public class FileController {
 
@@ -16,7 +17,6 @@ public class FileController {
         this.fileService = fileService;
     }
 
-    @CrossOrigin
     @GetMapping("/photo/{photo-id}")
     public Resource downloadPhoto(@PathVariable("photo-id") String photoId) {
         return fileService.find(photoId).orElse(null);

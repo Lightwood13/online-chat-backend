@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+@CrossOrigin
 @RestController
 public class AuthenticationController {
 
@@ -17,13 +18,11 @@ public class AuthenticationController {
         this.userService = userService;
     }
 
-    @CrossOrigin
     @PostMapping("/login")
     public String login(@RequestBody LoginCredentialsDTO credentials) {
         return userService.loginUser(credentials);
     }
 
-    @CrossOrigin
     @PostMapping("/signup")
     public String signup(@RequestBody SignUpCredentialsDTO credentials) {
         return userService.signupUser(credentials);

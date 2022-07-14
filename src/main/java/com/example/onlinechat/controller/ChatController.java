@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+@CrossOrigin
 @RestController
 public class ChatController {
 
@@ -24,19 +25,16 @@ public class ChatController {
         this.notificationService = notificationService;
     }
 
-    @CrossOrigin
     @GetMapping("/chats")
     public List<GroupChatWithLastMessageDTO> chats(Authentication authentication) {
         return groupChatService.findGroupChatsWithLastMessageByMemberId(UUID.fromString(authentication.getName()));
     }
 
-    @CrossOrigin
     @GetMapping("/chat/{groupChatId}")
     public GroupChatWithMembersAndMessagesDTO chat(@PathVariable UUID groupChatId, Authentication authentication) {
         return groupChatService.getGroupChatWithMembersAndMessagesById(groupChatId, UUID.fromString(authentication.getName()));
     }
 
-    @CrossOrigin
     @PostMapping("/send")
     public void sendMessage(@RequestBody NewMessageDTO message, Authentication authentication) {
         final MessageDTO savedMessage = groupChatService.saveNewMessage(
@@ -46,7 +44,6 @@ public class ChatController {
         notificationService.notifyAboutNewMessage(savedMessage);
     }
 
-    @CrossOrigin
     @PostMapping("/group-chat-profile-photo/{group-chat-id}")
     public FileLocationDTO uploadChatProfilePhoto(
             @PathVariable("group-chat-id") UUID groupChatId,

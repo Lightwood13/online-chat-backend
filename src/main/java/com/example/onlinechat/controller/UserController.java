@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+@CrossOrigin
 @RestController
 public class UserController {
 
@@ -29,19 +30,16 @@ public class UserController {
         this.notificationService = notificationService;
     }
 
-    @CrossOrigin
     @GetMapping("/my-profile-info")
     public UserDTO myInfo(Authentication authentication) {
         return userService.getByIdOrThrow(UUID.fromString(authentication.getName()));
     }
 
-    @CrossOrigin
     @GetMapping("/profile-info")
     public List<UserDTO> profileInfo(@RequestParam List<UUID> ids) {
         return userService.findUsersByIdIn(ids);
     }
 
-    @CrossOrigin
     @PostMapping("/profile-photo")
     public FileLocationDTO uploadProfilePhoto(
             @RequestParam MultipartFile file,

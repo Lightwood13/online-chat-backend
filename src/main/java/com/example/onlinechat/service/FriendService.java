@@ -22,4 +22,7 @@ public class FriendService {
                 .stream().map(UserDTO::fromUserProjection).toList();
     }
 
+    public boolean removeFriend(UUID userId, UUID friendId) {
+        return friendRepository.removeFriend(userId.toString(), friendId.toString()) > 0;
+    }
 }

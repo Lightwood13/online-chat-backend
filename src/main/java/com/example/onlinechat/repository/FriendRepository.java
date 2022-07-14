@@ -3,6 +3,7 @@ package com.example.onlinechat.repository;
 import com.example.onlinechat.model.Friend;
 import com.example.onlinechat.model.keys.FriendPrimaryKey;
 import com.example.onlinechat.service.projections.UserProjection;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -21,4 +22,11 @@ public interface FriendRepository extends CrudRepository<Friend, FriendPrimaryKe
             " WHERE cast(f.user_id AS varchar) = :user_id",
             nativeQuery = true)
     List<UserProjection> getFriendsByUserId(@Param("user_id") String userId);
+
+    @Modifying
+    @Query(value = "DELETE FROM friend f" +
+            " WHERE (cast(f.user_id AS varchar) = :user_id   AND cast(f.friend_id AS varchar) = :friend_id)" +
+            " OR    (cast(f.user_id AS varchar) = :friend_id AND cast(f.friend_id AS varchar) = :user_id)",
+            nativeQuery = true)
+    int removeFriend(@Param("user_id") String userId, @Param("friend_id") String friendId);
 }
