@@ -44,15 +44,12 @@ public class GroupChatService {
     }
 
     private void confirmAccessOrThrow(UUID groupChatId, UUID userId) {
-        if (!userGroupChatRepository.existsByUserIdAndGroupChatId(userId, groupChatId))
+        if (!userGroupChatRepository.existsById_UserIdAndId_GroupChatId(userId, groupChatId))
             throw new ForbiddenException();
     }
 
     public List<UUID> findUserIdsThatShareGroupChatWith(UUID userId) {
-        return userGroupChatRepository.getUserIdsThatShareGroupChatWith(userId.toString())
-                .stream()
-                .map(UUID::fromString)
-                .toList();
+        return userGroupChatRepository.getUserIdsThatShareGroupChatWith(userId);
     }
 
     public List<GroupChatWithLastMessageDTO> findGroupChatsWithLastMessageByMemberId(UUID id) {

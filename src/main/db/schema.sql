@@ -13,7 +13,8 @@ CREATE TABLE friend
 (
     user_id   uuid NOT NULL REFERENCES users (id) ON DELETE CASCADE,
     friend_id uuid NOT NULL REFERENCES users (id) ON DELETE CASCADE,
-    CONSTRAINT friends_pkey PRIMARY KEY (user_id, friend_id)
+    pending   bool NOT NULL,
+    CONSTRAINT friend_pkey PRIMARY KEY (user_id, friend_id)
 );
 
 CREATE TABLE group_chat

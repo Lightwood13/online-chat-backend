@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -43,6 +44,10 @@ public class UserService {
     private User getUserByIdOrThrow(UUID userId) {
         return userRepository.findUserById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    }
+
+    public Optional<UserDTO> findUserByUsernameOrThrow(String username) {
+        return userRepository.findUserByUsername(username).map(UserDTO::fromUser);
     }
 
     public UserDTO getByIdOrThrow(UUID userId) {

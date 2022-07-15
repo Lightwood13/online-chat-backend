@@ -12,14 +12,13 @@ import java.util.UUID;
 
 @Repository
 public interface UserGroupChatRepository extends CrudRepository<UserGroupChat, UserGroupChatPrimaryKey> {
-    boolean existsByUserIdAndGroupChatId(UUID userId, UUID groupChatId);
+    boolean existsById_UserIdAndId_GroupChatId(UUID userId, UUID groupChatId);
 
-    @Query(value = "SELECT DISTINCT cast(ugc.user_id AS varchar)" +
-            " FROM user_group_chat ugc" +
-            " WHERE ugc.group_chat_id IN" +
-            "    (SELECT ugc2.group_chat_id" +
-            "    FROM user_group_chat ugc2" +
-            "    WHERE cast(ugc2.user_id AS varchar) = :user_id)",
-            nativeQuery = true)
-    List<String> getUserIdsThatShareGroupChatWith(@Param("user_id") String userId);
+    @Query("SELECT DISTINCT ugc.user.id" +
+            " FROM UserGroupChat ugc" +
+            " WHERE ugc.groupChat.id IN " +
+            "   (SELECT ugc2.groupChat.id" +
+            "    FROM UserGroupChat ugc2" +
+            "    WHERE ugc2.user.id = :user_id)")
+    List<UUID> getUserIdsThatShareGroupChatWith(@Param("user_id") UUID userId);
 }
