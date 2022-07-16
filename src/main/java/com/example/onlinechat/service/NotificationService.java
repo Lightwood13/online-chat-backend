@@ -41,4 +41,12 @@ public class NotificationService {
             );
         }
     }
+
+    public void notifyAboutFriendListUpdate(UUID userId) {
+        messagingTemplate.convertAndSendToUser(
+                userId.toString(),
+                "/friend-list-updates",
+                "Friend list updated"
+        );
+    }
 }

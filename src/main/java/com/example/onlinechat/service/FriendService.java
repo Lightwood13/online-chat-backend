@@ -34,7 +34,7 @@ public class FriendService {
                 .stream().map(UserDTO::fromUser).toList();
     }
 
-    public void sendFriendRequest(UUID from, String toUsername) {
+    public UUID sendFriendRequest(UUID from, String toUsername) {
         final UserDTO toUser = userService.findUserByUsernameOrThrow(toUsername)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
@@ -66,6 +66,7 @@ public class FriendService {
                     );
                 });
         friendRepository.save(new Friend(new FriendPrimaryKey(), User.of(from), User.of(toUser.id()), true));
+        return toUser.id();
     }
 
     public void acceptFriendRequest(UUID from, UUID to) {

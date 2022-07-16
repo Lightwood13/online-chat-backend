@@ -1,6 +1,7 @@
 package com.example.onlinechat.controller;
 
 import com.example.onlinechat.service.FriendService;
+import com.example.onlinechat.service.NotificationService;
 import com.example.onlinechat.service.dto.UserDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -15,9 +16,11 @@ import java.util.UUID;
 public class FriendController {
 
     private final FriendService friendService;
+    private final NotificationService notificationService;
 
-    public FriendController(FriendService friendService) {
+    public FriendController(FriendService friendService, NotificationService notificationService) {
         this.friendService = friendService;
+        this.notificationService = notificationService;
     }
 
     @GetMapping("/my-friends")
@@ -30,6 +33,7 @@ public class FriendController {
         if (!friendService.removeFriend(UUID.fromString(authentication.getName()), friendId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "You are not friends");
         }
+        notificationService.notifyAboutFriendListUpdate(friendId);
     }
 
     @GetMapping("/friend/request/pending")
@@ -39,16 +43,19 @@ public class FriendController {
 
     @PostMapping("/friend/request/send/{toUsername}")
     public void sendFriendRequest(Authentication authentication, @PathVariable("toUsername") String toUsername){
-        friendService.sendFriendRequest(UUID.fromString(authentication.getName()), toUsername);
+        final UUID toId = friendService.sendFriendRequest(UUID.fromString(authentication.getName()), toUsername);
+        notificationService.notifyAboutFriendListUpdate(toId);
     }
 
     @PostMapping("/friend/request/accept/{fromId}")
     public void acceptFriendRequest(Authentication authentication, @PathVariable("fromId") UUID fromId){
         friendService.acceptFriendRequest(fromId, UUID.fromString(authentication.getName()));
+        notificationService.notifyAboutFriendListUpdate(fromId);
     }
 
-    @PostMapping("/friend/request/decline/{fromId}")
+    @PostMapping("/friend/request/reject/{fromId}")
     public void declineFriendRequest(Authentication authentication, @PathVariable("fromId") UUID fromId){
         friendService.declineFriendRequest(fromId, UUID.fromString(authentication.getName()));
+        notificationService.notifyAboutFriendListUpdate(fromId);
     }
 }
