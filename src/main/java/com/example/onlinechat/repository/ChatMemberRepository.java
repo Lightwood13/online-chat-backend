@@ -1,6 +1,6 @@
 package com.example.onlinechat.repository;
 
-import com.example.onlinechat.model.UserGroupChat;
+import com.example.onlinechat.model.ChatMember;
 import com.example.onlinechat.model.keys.UserGroupChatPrimaryKey;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -11,14 +11,14 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface UserGroupChatRepository extends CrudRepository<UserGroupChat, UserGroupChatPrimaryKey> {
+public interface ChatMemberRepository extends CrudRepository<ChatMember, UserGroupChatPrimaryKey> {
     boolean existsById_UserIdAndId_GroupChatId(UUID userId, UUID groupChatId);
 
     @Query("SELECT DISTINCT ugc.user.id" +
-            " FROM UserGroupChat ugc" +
+            " FROM ChatMember ugc" +
             " WHERE ugc.groupChat.id IN " +
             "   (SELECT ugc2.groupChat.id" +
-            "    FROM UserGroupChat ugc2" +
+            "    FROM ChatMember ugc2" +
             "    WHERE ugc2.user.id = :user_id)")
     List<UUID> getUserIdsThatShareGroupChatWith(@Param("user_id") UUID userId);
 }

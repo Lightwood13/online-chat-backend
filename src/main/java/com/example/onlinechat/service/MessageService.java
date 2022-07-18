@@ -32,8 +32,8 @@ public class MessageService {
 
     public MessageDTO save(UUID groupChatId, UUID userId, String text) {
         final Message savedMessage = messageRepository.save(Message.builder()
-                .groupChat(GroupChat.of(groupChatId))
-                .author(User.of(userId))
+                .groupChat(GroupChat.withId(groupChatId))
+                .author(User.withId(userId))
                 .text(text)
                 .sentOn(Timestamp.from(Instant.now()))
                 .build()

@@ -42,7 +42,7 @@ public class UserService {
     }
 
     private User getUserByIdOrThrow(UUID userId) {
-        return userRepository.findUserById(userId)
+        return userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 

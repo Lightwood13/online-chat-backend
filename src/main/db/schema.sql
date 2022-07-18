@@ -21,20 +21,25 @@ CREATE TABLE group_chat
 (
     id                     uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
     name                   varchar(64) NOT NULL,
-    profile_photo_location text
+    profile_photo_location text,
+    created_on             timestamp   NOT NULL
 );
 
-CREATE TABLE user_group_chat
+CREATE TYPE role AS ENUM ('member', 'admin');
+CREATE CAST (varchar as role) WITH INOUT AS IMPLICIT;
+
+CREATE TABLE chat_member
 (
-    user_id       uuid NOT NULL REFERENCES users (id)      ON DELETE CASCADE,
+    user_id       uuid NOT NULL REFERENCES users (id) ON DELETE CASCADE,
     group_chat_id uuid NOT NULL REFERENCES group_chat (id) ON DELETE CASCADE,
+    role          role NOT NULL,
     CONSTRAINT user_group_chat_pkey PRIMARY KEY (user_id, group_chat_id)
 );
 
 CREATE TABLE message
 (
     id            uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-    group_chat_id uuid         NOT NULL REFERENCES group_chat (id),
+    group_chat_id uuid         NOT NULL REFERENCES group_chat (id) ON DELETE CASCADE,
     -- TODO: add ability to delete users
     author_id     uuid         NOT NULL REFERENCES users (id),
     text          varchar(256) NOT NULL,

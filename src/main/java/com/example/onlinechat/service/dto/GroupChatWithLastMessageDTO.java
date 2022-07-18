@@ -9,6 +9,8 @@ public interface GroupChatWithLastMessageDTO {
 
     String getProfilePhotoLocation();
 
+    Timestamp getCreatedOn();
+
     String getLastMessageId();
 
     String getLastMessageAuthorId();

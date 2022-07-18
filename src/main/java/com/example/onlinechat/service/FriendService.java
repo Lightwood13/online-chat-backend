@@ -65,7 +65,7 @@ public class FriendService {
                             "You already have a pending request from this user"
                     );
                 });
-        friendRepository.save(new Friend(new FriendPrimaryKey(), User.of(from), User.of(toUser.id()), true));
+        friendRepository.save(new Friend(new FriendPrimaryKey(), User.withId(from), User.withId(toUser.id()), true));
         return toUser.id();
     }
 
@@ -78,7 +78,7 @@ public class FriendService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "You are already friends");
         }
         friendRequest.setPending(false);
-        friendRepository.save(new Friend(new FriendPrimaryKey(), User.of(to), User.of(from), false));
+        friendRepository.save(new Friend(new FriendPrimaryKey(), User.withId(to), User.withId(from), false));
     }
 
     public void declineFriendRequest(UUID from, UUID to) {

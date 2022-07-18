@@ -1,6 +1,7 @@
 package com.example.onlinechat.service;
 
 import com.example.onlinechat.service.dto.GroupChatDTO;
+import com.example.onlinechat.service.dto.MemberDTO;
 import com.example.onlinechat.service.dto.MessageDTO;
 import com.example.onlinechat.service.dto.UserDTO;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -33,9 +34,9 @@ public class NotificationService {
     }
 
     public void notifyAboutGroupChatProfileUpdate(GroupChatDTO updatedGroupChat) {
-        for (UUID memberId: updatedGroupChat.members()) {
+        for (MemberDTO member: updatedGroupChat.members()) {
             messagingTemplate.convertAndSendToUser(
-                    memberId.toString(),
+                    member.id().toString(),
                     "/group-chat-profile-updates",
                     updatedGroupChat
             );
