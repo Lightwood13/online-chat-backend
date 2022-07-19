@@ -3,10 +3,8 @@ package com.example.onlinechat.controller;
 import com.example.onlinechat.service.FriendService;
 import com.example.onlinechat.service.NotificationService;
 import com.example.onlinechat.service.dto.UserDTO;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
@@ -30,9 +28,7 @@ public class FriendController {
 
     @PostMapping("/friend/remove/{friendId}")
     public void removeFriend(Authentication authentication, @PathVariable("friendId") UUID friendId) {
-        if (!friendService.removeFriend(UUID.fromString(authentication.getName()), friendId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "You are not friends");
-        }
+        friendService.removeFriend(UUID.fromString(authentication.getName()), friendId);
         notificationService.notifyAboutFriendListUpdate(friendId);
     }
 

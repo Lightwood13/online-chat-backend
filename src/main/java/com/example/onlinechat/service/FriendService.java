@@ -92,7 +92,9 @@ public class FriendService {
         friendRepository.delete(friendRequest);
     }
 
-    public boolean removeFriend(UUID userId, UUID friendId) {
-        return friendRepository.removeFriend(userId, friendId) > 0;
+    public void removeFriend(UUID userId, UUID friendId) {
+        if (friendRepository.removeFriend(userId, friendId) == 0) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "You are not friends");
+        }
     }
 }

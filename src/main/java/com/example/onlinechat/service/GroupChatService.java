@@ -81,6 +81,7 @@ public class GroupChatService {
         return messageService.save(groupChatId, userId, message);
     }
 
+    // TODO: move to separate service and rethrow exception as http exception
     public FileLocationDTO updateProfilePhoto(
             UUID groupChatId,
             UUID userId,
