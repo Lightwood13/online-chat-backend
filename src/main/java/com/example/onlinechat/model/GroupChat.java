@@ -25,7 +25,7 @@ public class GroupChat {
 
     private Timestamp createdOn;
 
-    @OneToMany(mappedBy = "groupChat", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "groupChat", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     Set<ChatMember> members;
 
     public static GroupChat withId(UUID id) {

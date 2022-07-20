@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/chat")
+@RequestMapping("/chats")
 public class ChatMemberController {
 
     private final GroupChatMemberService groupChatMemberService;
@@ -17,12 +17,12 @@ public class ChatMemberController {
         this.groupChatMemberService = groupChatMemberService;
     }
 
-    @DeleteMapping("/{group-chat-id}/user/me")
+    @DeleteMapping("/{group-chat-id}/users/me")
     void leaveGroupChat(@PathVariable("group-chat-id") UUID groupChatId, Authentication authentication) {
         groupChatMemberService.leaveGroupChat(groupChatId, UUID.fromString(authentication.getName()));
     }
 
-    @DeleteMapping("/{group-chat-id}/user/{user-id}")
+    @DeleteMapping("/{group-chat-id}/users/{user-id}")
     void kickUser(
             @PathVariable("group-chat-id") UUID groupChatId,
             @PathVariable("user-id") UUID userId,

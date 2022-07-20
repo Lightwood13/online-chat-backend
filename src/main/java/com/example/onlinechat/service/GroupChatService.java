@@ -3,7 +3,6 @@ package com.example.onlinechat.service;
 import com.example.onlinechat.exception.ForbiddenException;
 import com.example.onlinechat.model.ChatMember;
 import com.example.onlinechat.model.GroupChat;
-import com.example.onlinechat.model.keys.UserGroupChatPrimaryKey;
 import com.example.onlinechat.repository.ChatMemberRepository;
 import com.example.onlinechat.repository.GroupChatRepository;
 import com.example.onlinechat.repository.UserRepository;
@@ -104,14 +103,13 @@ public class GroupChatService {
         if (!memberIds.contains(ownerId)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Members should include owner");
         }
-        final GroupChat savedGroupChat = groupChatRepository.save(GroupChat.builder()
+        final GroupChat groupChat = GroupChat.builder()
                 .name(name)
                 .createdOn(Timestamp.from(Instant.now()))
-                .build());
+                .build();
         final Set<ChatMember> members = StreamSupport.stream(userRepository.findAllById(memberIds).spliterator(), false)
                 .map(user -> ChatMember.builder()
-                        .id(new UserGroupChatPrimaryKey(user.getId(), savedGroupChat.getId()))
-                        .groupChat(savedGroupChat)
+                        .groupChat(groupChat)
                         .user(user)
                         .role(user.getId().equals(ownerId) ? ChatMember.Role.admin : ChatMember.Role.member)
                         .build())
@@ -119,7 +117,8 @@ public class GroupChatService {
         if (members.size() != memberIds.size()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "One of user ids is not found");
         }
-        savedGroupChat.setMembers(members);
+        groupChat.setMembers(members);
+        final GroupChat savedGroupChat = groupChatRepository.save(groupChat);
         return GroupChatDTO.fromGroupChat(savedGroupChat);
     }
 }

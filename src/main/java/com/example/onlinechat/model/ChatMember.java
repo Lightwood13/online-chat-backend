@@ -19,8 +19,9 @@ public class ChatMember {
         member, admin
     }
 
+    @Builder.Default
     @EmbeddedId
-    UserGroupChatPrimaryKey id;
+    UserGroupChatPrimaryKey id = new UserGroupChatPrimaryKey();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("userId")
@@ -40,11 +41,13 @@ public class ChatMember {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
         ChatMember that = (ChatMember) o;
-        return id != null && Objects.equals(id, that.id);
+        return user != null && groupChat != null
+                && Objects.equals(user.getId(), ((ChatMember) o).getUser().getId())
+                && Objects.equals(groupChat.getId(), ((ChatMember) o).getGroupChat().getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return 31;
     }
 }

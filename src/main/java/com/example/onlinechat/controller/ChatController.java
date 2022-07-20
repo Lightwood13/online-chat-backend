@@ -1,5 +1,6 @@
 package com.example.onlinechat.controller;
 
+import com.example.onlinechat.service.AuthenticationService;
 import com.example.onlinechat.service.GroupChatService;
 import com.example.onlinechat.service.NotificationService;
 import com.example.onlinechat.service.dto.*;
@@ -13,6 +14,7 @@ import java.util.UUID;
 
 @CrossOrigin
 @RestController
+@RequestMapping("/chats")
 public class ChatController {
 
     private final GroupChatService groupChatService;
@@ -25,33 +27,33 @@ public class ChatController {
         this.notificationService = notificationService;
     }
 
-    @GetMapping("/chats")
+    @GetMapping
     public List<GroupChatWithLastMessageDTO> chats(Authentication authentication) {
         return groupChatService.findGroupChatsWithLastMessageByMemberId(UUID.fromString(authentication.getName()));
     }
 
-    @GetMapping("/chat/info/{groupChatId}")
+    @GetMapping("/{groupChatId}/info")
     public GroupChatDTO chatInfo(@PathVariable UUID groupChatId, Authentication authentication) {
         return groupChatService.getByIdOrThrow(groupChatId, UUID.fromString(authentication.getName()));
     }
 
-    @GetMapping("/chat/messages/{groupChatId}")
+    @GetMapping("/{groupChatId}/messages")
     public List<MessageDTO> chatMessages(@PathVariable UUID groupChatId, Authentication authentication) {
         return groupChatService.getMessages(groupChatId, UUID.fromString(authentication.getName()));
     }
 
-    @PostMapping("/send")
-    public void sendMessage(@RequestBody NewMessageDTO message, Authentication authentication) {
+    @PostMapping("/{groupChatId}/messages")
+    public void sendMessage(@PathVariable UUID groupChatId, @RequestBody NewMessageDTO message, Authentication authentication) {
         final MessageDTO savedMessage = groupChatService.saveNewMessage(
                 UUID.fromString(authentication.getName()),
-                message.groupChatId(),
+                groupChatId,
                 message.text());
         notificationService.notifyAboutNewMessage(savedMessage);
     }
 
-    @PostMapping("/chat/profile-photo/{group-chat-id}")
+    @PutMapping(value = "/{groupChatId}/profile-photo")
     public FileLocationDTO uploadChatProfilePhoto(
-            @PathVariable("group-chat-id") UUID groupChatId,
+            @PathVariable UUID groupChatId,
             @RequestParam MultipartFile file,
             Authentication authentication) throws Exception {
         final UUID userId = UUID.fromString(authentication.getName());
@@ -67,12 +69,12 @@ public class ChatController {
         return result;
     }
 
-    @PostMapping("/chat/create")
-    void createNewGroupChat(@RequestBody NewGroupChatDTO chat, Authentication authentication) {
+    @PostMapping
+    void createNewGroupChat(@RequestBody NewGroupChatDTO chat) {
         final GroupChatDTO newGroupChat = groupChatService.createNewGroupChat(
                 chat.name(),
                 chat.members(),
-                UUID.fromString(authentication.getName()));
+                AuthenticationService.getCurrentUserId());
         notificationService.notifyAboutGroupChatProfileUpdate(newGroupChat);
     }
 }

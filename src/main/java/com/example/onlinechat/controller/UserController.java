@@ -15,6 +15,7 @@ import java.util.UUID;
 
 @CrossOrigin
 @RestController
+@RequestMapping("/users")
 public class UserController {
 
     private final UserService userService;
@@ -30,7 +31,7 @@ public class UserController {
         this.notificationService = notificationService;
     }
 
-    @GetMapping("/my-profile-info")
+    @GetMapping("/me/profile-info")
     public UserDTO myInfo(Authentication authentication) {
         return userService.getByIdOrThrow(UUID.fromString(authentication.getName()));
     }
@@ -40,7 +41,7 @@ public class UserController {
         return userService.findUsersByIdIn(ids);
     }
 
-    @PostMapping("/profile-photo")
+    @PutMapping("/me/profile-photo")
     public FileLocationDTO uploadProfilePhoto(
             @RequestParam MultipartFile file,
             Authentication authentication

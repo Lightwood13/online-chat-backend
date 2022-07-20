@@ -11,6 +11,7 @@ import java.util.UUID;
 
 @CrossOrigin
 @RestController
+@RequestMapping("/friends")
 public class FriendController {
 
     private final FriendService friendService;
@@ -21,35 +22,35 @@ public class FriendController {
         this.notificationService = notificationService;
     }
 
-    @GetMapping("/my-friends")
+    @GetMapping
     public List<UserDTO> myFriends(Authentication authentication) {
         return friendService.getFriendsByUserId(UUID.fromString(authentication.getName()));
     }
 
-    @PostMapping("/friend/remove/{friendId}")
+    @DeleteMapping("/{friendId}")
     public void removeFriend(Authentication authentication, @PathVariable("friendId") UUID friendId) {
         friendService.removeFriend(UUID.fromString(authentication.getName()), friendId);
         notificationService.notifyAboutFriendListUpdate(friendId);
     }
 
-    @GetMapping("/friend/request/pending")
+    @GetMapping("/requests")
     public List<UserDTO> getPendingFriendRequests(Authentication authentication) {
         return friendService.getPendingFriendRequestsByUserId(UUID.fromString(authentication.getName()));
     }
 
-    @PostMapping("/friend/request/send/{toUsername}")
+    @PostMapping("/requests/{toUsername}")
     public void sendFriendRequest(Authentication authentication, @PathVariable("toUsername") String toUsername){
         final UUID toId = friendService.sendFriendRequest(UUID.fromString(authentication.getName()), toUsername);
         notificationService.notifyAboutFriendListUpdate(toId);
     }
 
-    @PostMapping("/friend/request/accept/{fromId}")
+    @PatchMapping("/requests/{fromId}")
     public void acceptFriendRequest(Authentication authentication, @PathVariable("fromId") UUID fromId){
         friendService.acceptFriendRequest(fromId, UUID.fromString(authentication.getName()));
         notificationService.notifyAboutFriendListUpdate(fromId);
     }
 
-    @PostMapping("/friend/request/reject/{fromId}")
+    @DeleteMapping("/requests/{fromId}")
     public void declineFriendRequest(Authentication authentication, @PathVariable("fromId") UUID fromId){
         friendService.declineFriendRequest(fromId, UUID.fromString(authentication.getName()));
         notificationService.notifyAboutFriendListUpdate(fromId);
