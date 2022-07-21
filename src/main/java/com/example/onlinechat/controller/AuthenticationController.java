@@ -3,12 +3,10 @@ package com.example.onlinechat.controller;
 import com.example.onlinechat.service.UserService;
 import com.example.onlinechat.service.dto.LoginCredentialsDTO;
 import com.example.onlinechat.service.dto.SignUpCredentialsDTO;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-@CrossOrigin
 @RestController
 public class AuthenticationController {
 

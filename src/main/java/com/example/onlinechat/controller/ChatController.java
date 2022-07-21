@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/chats")
 public class ChatController {

@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/users")
 public class UserController {

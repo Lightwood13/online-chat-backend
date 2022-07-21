@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/chats")
 public class ChatMemberController {
