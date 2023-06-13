@@ -4,9 +4,6 @@ A simple online chat with friends and groups.
 Frontend and backend are done separately in 
 https://github.com/Lightwood13/online-chat-frontend,
 https://github.com/Lightwood13/online-chat-backend.
-Frontend is currently deployed to Netlify and backend to AWS.
-
-You can check it out at https://onlinechat.party.
 
 ### Features
 
@@ -28,12 +25,3 @@ STOMP over Websockets is used to send realtime notifications to clients.
 ### Frontend
 
 Frontend is written using React.js.
-
-### Deployment
-
-Frontend is deployed as a static page to Netlify.
-
-Backend is deployed using AWS. Database is deployed to the RDS and
-application is packaged as Docker image and deployed to ECS container running on EC2.
-
-Application uses HTTPS with a free certificate issued by Let's Encrypt.
